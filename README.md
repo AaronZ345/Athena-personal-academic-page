@@ -10,7 +10,7 @@ The name keeps the Greek deity convention while making the repository purpose ex
 - Light and dark themes with system-theme detection and a manual toggle.
 - Polished UI details: soft surfaces, subtle shadows, hover states, semantic section icons, rounded media frames, compact action chips, and mobile-safe typography.
 - Publication analytics generated from `src/content/publications.js`: yearly count, research area distribution, publication type, venue family, selected papers, and open artifacts.
-- Publication cards with featured figures, tags, artifact links, inferred action icons, optional GitHub star badges, and grouped paper sections.
+- Publication and project cards with featured figures, tags, artifact links, inferred action icons, optional GitHub star badges, and grouped paper sections.
 - Configurable sections for news, projects, teaching, talks, education, experience, awards, and academic service.
 - SEO and social preview metadata injected from `src/content/site.js`.
 - GitHub Pages deployment workflow included.
@@ -105,6 +105,14 @@ For favicon generation, the AcadHomepage template recommends [redketchup favicon
 Publication and project link icons are inferred from labels. These labels work out of the box:
 
 `Paper`, `Code`, `Dataset`, `Demo`, `Slides`, `Video`, `DOI`, `BibTeX`, `Poster`, `Documentation`, `Project`, and `Download`.
+
+For GitHub links, add a numeric `stars` field when you want a reliable fallback badge without depending on the GitHub API:
+
+```js
+{ label: "Code", href: "https://github.com/owner/repo", stars: 128 }
+```
+
+Links with `stars` set render immediately and are skipped by the live GitHub star loader, which avoids blank badges when the GitHub API is rate-limited.
 
 Profile link icon keys include:
 

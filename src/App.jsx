@@ -32,7 +32,8 @@ const chartColors = ["#245a96", "#5c9ec6", "#7a8f36", "#b66f36", "#7b6fb3", "#3f
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
-  const githubStars = useGithubStars(publications);
+  const starSources = useMemo(() => [...publications, ...projects], []);
+  const githubStars = useGithubStars(starSources);
   const stats = useMemo(() => getPublicationStats(publications), []);
   const groups = useMemo(() => getPublicationGroups(publications, publicationGroups), []);
   const visibleSections = useMemo(() => sections.filter((section) => section.enabled !== false), []);
@@ -74,7 +75,7 @@ function App() {
         githubStars={githubStars}
       />
     )),
-    projects: <ProjectList items={projects} />,
+    projects: <ProjectList items={projects} githubStars={githubStars} />,
     teaching: <Timeline items={teaching} />,
     talks: <Timeline items={talks} />,
     education: <Timeline items={education} />,
@@ -441,7 +442,7 @@ function PublicationMeta({ paper, compact = false }) {
   );
 }
 
-function ProjectList({ items }) {
+function ProjectList({ items, githubStars }) {
   return (
     <div className="project-grid">
       {items.map((project) => (
@@ -457,7 +458,7 @@ function ProjectList({ items }) {
           </div>
           <p>{project.summary}</p>
           {project.tags?.length ? <TagList items={project.tags} className="project-tags" /> : null}
-          <ActionLinks links={project.links} />
+          <ActionLinks links={project.links} githubStars={githubStars} />
         </article>
       ))}
     </div>
@@ -517,7 +518,9 @@ function ActionLinks({ links, githubStars = {} }) {
     <div className="action-links">
       {links.map((link) => {
         const githubRepo = getGithubRepo(link.href);
-        const stars = githubRepo ? githubStars[githubRepo] : undefined;
+        const liveStars = githubRepo ? githubStars[githubRepo] : undefined;
+        const fallbackStars = typeof link.stars === "number" ? link.stars : undefined;
+        const stars = liveStars ?? fallbackStars;
 
         return (
           <a key={`${link.label}-${link.href}`} href={link.href} target="_blank" rel="noreferrer">
@@ -679,7 +682,7 @@ function useGithubStars(papers) {
     papers.forEach((paper) => {
       paper.links?.forEach((link) => {
         const repo = getGithubRepo(link.href);
-        if (repo) found.add(repo);
+        if (repo && typeof link.stars !== "number") found.add(repo);
       });
     });
     return Array.from(found);

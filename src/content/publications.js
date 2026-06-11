@@ -13,7 +13,7 @@ export const publications = [
     featured: true,
     links: [
       { label: "Paper", href: "https://example.com/paper.pdf" },
-      { label: "Code", href: "https://github.com/example/reliable-agents" },
+      { label: "Code", href: "https://github.com/example/reliable-agents", stars: 128 },
       { label: "Dataset", href: "https://example.com/dataset" },
       { label: "Slides", href: "https://example.com/slides" },
       { label: "BibTeX", href: "https://example.com/cite.bib" }
@@ -90,7 +90,7 @@ export const publications = [
     links: [
       { label: "Paper", href: "https://example.com/journal-paper" },
       { label: "DOI", href: "https://doi.org/10.0000/example" },
-      { label: "Code", href: "https://github.com/example/review-workflows" }
+      { label: "Code", href: "https://github.com/example/review-workflows", stars: 42 }
     ]
   }
 ];

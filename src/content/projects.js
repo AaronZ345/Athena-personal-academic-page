@@ -6,7 +6,7 @@ export const projects = [
       "A reusable academic website framework with configurable sections, publication analytics, and GitHub Pages deployment.",
     tags: ["React", "Vite", "Academic Website"],
     links: [
-      { label: "Code", href: "https://github.com/example/athena-personal-academic-page" },
+      { label: "Code", href: "https://github.com/AaronZ345/Athena-personal-academic-page", stars: 1 },
       { label: "Documentation", href: "https://example.com/docs" }
     ]
   },

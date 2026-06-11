@@ -73,6 +73,14 @@ Most text fields can be plain strings. For text with links or bold spans, use an
 
 Publication/project link icons are inferred from labels such as `Paper`, `Code`, `Dataset`, `Demo`, `Slides`, `Video`, `DOI`, `BibTeX`, `Poster`, `Documentation`, and `Download`.
 
+GitHub links can include `stars` as a numeric fallback:
+
+```js
+{ label: "Code", href: "https://github.com/owner/repo", stars: 128 }
+```
+
+Configured star counts render immediately and are not fetched from the GitHub API. This keeps badges visible when anonymous GitHub API requests are rate-limited.
+
 Profile link icon keys include `Email`, `Scholar`, `ORCID`, `DBLP`, `GitHub`, `LinkedIn`, `Website`, `Lab`, `CV`, and `HuggingFace`.
 
 News icon keys include `release`, `accepted`, `dataset`, `code`, `talk`, `teaching`, `award`, `career`, `degree`, `visit`, and `service`.

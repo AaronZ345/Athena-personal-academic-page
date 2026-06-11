@@ -20,13 +20,13 @@ export const sections = [
     nav: "Publications",
     note: "Use * in author strings for equal contribution."
   },
-  { id: "projects", title: "Projects", nav: "Projects" },
   { id: "teaching", title: "Teaching", nav: "Teaching" },
   { id: "talks", title: "Talks", nav: "Talks" },
   { id: "education", title: "Education", nav: "Education" },
   { id: "experience", title: "Experience", nav: "Experience" },
   { id: "awards", title: "Awards", nav: "Awards" },
-  { id: "service", title: "Academic Service", nav: "Service" }
+  { id: "service", title: "Academic Service", nav: "Service" },
+  { id: "projects", title: "Projects", nav: "Projects" }
 ];
 
 export const publicationGroups = [
