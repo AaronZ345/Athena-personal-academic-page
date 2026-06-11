@@ -9,7 +9,7 @@ export const publications = [
     summary:
       "A framework for evaluating autonomous research agents with reproducible protocols and calibrated uncertainty.",
     tags: ["agents", "evaluation", "reproducibility"],
-    image: "/images/publication-placeholder.svg",
+    image: "images/publication-placeholder.svg",
     featured: true,
     links: [
       { label: "Paper", href: "https://example.com/paper.pdf" },
@@ -29,7 +29,7 @@ export const publications = [
     summary:
       "A design and systems study of interfaces that help domain experts inspect, compare, and repair model behavior.",
     tags: ["interfaces", "debugging", "human-ai"],
-    image: "/images/publication-placeholder.svg",
+    image: "images/publication-placeholder.svg",
     featured: true,
     links: [
       { label: "Paper", href: "https://example.com/chi-paper" },

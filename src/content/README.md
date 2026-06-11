@@ -29,13 +29,15 @@ Images stay in `public/images/`. Leave `profile.avatar` empty to use the generat
 
 Use these conventions so assets stay easy to find:
 
-- `public/images/avatar.webp` for the profile photo.
-- `public/images/<paper-slug>.png` or `.webp` for publication figures.
+- `public/images/avatar.webp` for the profile photo. Use `images/avatar.webp` in `profile.avatar`.
+- `public/images/<paper-slug>.png` or `.webp` for publication figures. Use `images/<paper-slug>.png` in `publications.js`.
 - `public/images/<project-slug>.png` or `.webp` for project images if you add project image support later.
 - `public/images/athena-og.svg` or another social preview image referenced by `siteMeta.image`.
 - `public/images/athena-mark.svg` or generated favicon files referenced by `index.html`.
 
 For favicon generation, [redketchup favicon-generator](https://redketchup.io/favicon-generator) is a practical option. Generate the favicon package there, then copy the needed outputs into `public/images/`.
+
+Use image paths without a leading slash. That keeps both root personal sites and project-page demos working.
 
 ## Section Control
 

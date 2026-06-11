@@ -55,7 +55,7 @@ In your GitHub repository:
 3. Push to `main`.
 4. Wait for the `Deploy Pages` workflow to finish.
 
-If you deploy to a custom domain, set `siteMeta.url` in `src/content/site.js` to that domain. If you deploy under a project subpath such as `/repo-name/`, adjust Vite `base` and image paths first; the default template assumes root deployment.
+If you deploy to a custom domain, set `siteMeta.url` in `src/content/site.js` to that domain. The included Vite config uses `/` for `USERNAME.github.io` repos and `/<repo-name>/` for project Pages builds, so the template also works as a project-page demo.
 
 ## Content
 
@@ -88,13 +88,15 @@ To keep a section on the page but remove it from the top navigation, set `nav: f
 
 ## Images
 
-Put all site images in `public/images/`. This keeps image paths easy to find and lets Vite serve them directly from stable URLs such as `/images/avatar.webp` or `/images/project-cover.png`.
+Put all site images in `public/images/`. This keeps image paths easy to find and lets Vite serve them directly from stable URLs such as `images/avatar.webp` or `images/project-cover.png`.
 
 Recommended layout:
 
 - Profile photo: `public/images/avatar.webp`, then set `profile.avatar` in `src/content/profile.js`.
 - Publication figures: `public/images/<paper-slug>.png` or `.webp`, then set `image` in `src/content/publications.js`.
 - Social preview image and favicon assets: keep them in `public/images/` and reference them from `src/content/site.js` or `index.html`.
+
+Use paths without a leading slash, for example `images/avatar.webp`. That keeps both `USERNAME.github.io` deployments and project-page demos working.
 
 For favicon generation, the AcadHomepage template recommends [redketchup favicon-generator](https://redketchup.io/favicon-generator). Generate the favicon package there, then copy the needed outputs into `public/images/`.
 
@@ -138,8 +140,8 @@ src/content/          Profile data and editable website content
 src/App.jsx           Page rendering logic
 src/icons.js          Icon mappings
 src/styles.css        Design system and responsive styling
+src/assets/fonts/     Bundled icon fonts processed by Vite
 public/images/        Avatars, publication figures, favicon, and preview images
-public/fonts/         Bundled icon fonts
 .github/workflows/    GitHub Pages deployment
 ```
 

@@ -29,5 +29,16 @@ function escapeHtml(value) {
 }
 
 export default defineConfig({
+  base: getBasePath(),
   plugins: [react(), siteMetaPlugin]
 });
+
+function getBasePath() {
+  const repository = process.env.GITHUB_REPOSITORY;
+  if (!repository) return "/";
+
+  const [owner, repo] = repository.split("/");
+  if (!owner || !repo) return "/";
+  if (repo.toLowerCase() === `${owner.toLowerCase()}.github.io`) return "/";
+  return `/${repo}/`;
+}
