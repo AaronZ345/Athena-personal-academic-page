@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Athena Personal Academic Page mark</title>
+  <desc id="desc">A geometric academic monogram with a book and column motif.</desc>
+  <rect width="512" height="512" rx="96" fill="#f6f8fb"/>
+  <path d="M148 388h216" fill="none" stroke="#245a96" stroke-width="28" stroke-linecap="round"/>
+  <path d="M180 354V178l76-42 76 42v176" fill="none" stroke="#245a96" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M218 218h76M218 268h76M218 318h76" fill="none" stroke="#5c9ec6" stroke-width="18" stroke-linecap="round"/>
+  <path d="M132 164h248L256 88 132 164Z" fill="#ffffff" stroke="#245a96" stroke-width="24" stroke-linejoin="round"/>
+</svg>

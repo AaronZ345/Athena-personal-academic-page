@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Athena Personal Academic Page preview</title>
+  <desc id="desc">Social preview image for the Athena Personal Academic Page framework.</desc>
+  <rect width="1200" height="630" fill="#fbfcfd"/>
+  <rect x="78" y="72" width="1044" height="486" rx="26" fill="#ffffff" stroke="#dce5ee"/>
+  <rect x="126" y="126" width="174" height="174" rx="42" fill="#edf5fb"/>
+  <path d="M162 246h102" fill="none" stroke="#245a96" stroke-width="14" stroke-linecap="round"/>
+  <path d="M178 224v-72l35-20 35 20v72" fill="none" stroke="#245a96" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M156 146h114l-57-34-57 34Z" fill="#ffffff" stroke="#245a96" stroke-width="11" stroke-linejoin="round"/>
+  <text x="344" y="194" fill="#202933" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700">Athena Personal Academic Page</text>
+  <text x="348" y="260" fill="#647180" font-family="Inter, Arial, sans-serif" font-size="32">A configurable personal academic website framework</text>
+  <rect x="348" y="330" width="178" height="74" rx="12" fill="#f6f8fb" stroke="#dce5ee"/>
+  <rect x="552" y="330" width="178" height="74" rx="12" fill="#f6f8fb" stroke="#dce5ee"/>
+  <rect x="756" y="330" width="178" height="74" rx="12" fill="#f6f8fb" stroke="#dce5ee"/>
+  <path d="M368 448h538" stroke="#dce5ee" stroke-width="16" stroke-linecap="round"/>
+  <path d="M368 492h394" stroke="#dce5ee" stroke-width="16" stroke-linecap="round"/>
+</svg>

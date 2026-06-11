@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Publication visual placeholder</title>
+  <desc id="desc">A clean abstract paper figure placeholder for academic publications.</desc>
+  <rect width="960" height="540" rx="24" fill="#fafdff"/>
+  <rect x="74" y="70" width="812" height="400" rx="18" fill="#ffffff" stroke="#dce5ee" stroke-width="4"/>
+  <path d="M132 148h264M132 204h360M132 260h240" stroke="#245a96" stroke-width="24" stroke-linecap="round"/>
+  <path d="M132 336h170M132 382h238" stroke="#dce5ee" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="674" cy="238" r="84" fill="#edf5fb" stroke="#5c9ec6" stroke-width="16"/>
+  <path d="M612 298l52-112 48 74 38-50 56 90" fill="none" stroke="#245a96" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
