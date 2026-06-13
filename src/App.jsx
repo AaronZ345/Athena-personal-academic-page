@@ -28,6 +28,7 @@ import {
 } from "./icons.js";
 
 const chartColors = ["#245a96", "#5c9ec6", "#7a8f36", "#b66f36", "#7b6fb3", "#3f8b78", "#b75d69"];
+const githubStarsCacheTtl = 1000 * 60 * 5;
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -682,7 +683,7 @@ function useGithubStars(papers) {
     papers.forEach((paper) => {
       paper.links?.forEach((link) => {
         const repo = getGithubRepo(link.href);
-        if (repo && typeof link.stars !== "number") found.add(repo);
+        if (repo) found.add(repo);
       });
     });
     return Array.from(found);
@@ -690,25 +691,36 @@ function useGithubStars(papers) {
   const [stars, setStars] = useState({});
 
   useEffect(() => {
-    if (!repos.length) return undefined;
+    if (!repos.length) {
+      setStars({});
+      return undefined;
+    }
 
     let cancelled = false;
-    const cacheTtl = 1000 * 60 * 60 * 12;
+    const now = Date.now();
+    const cachedByRepo = Object.fromEntries(
+      repos.map((repo) => [repo, readGithubStarsCache(repo)])
+    );
+
+    const cachedEntries = repos.flatMap((repo) => {
+      const cached = cachedByRepo[repo];
+      return cached ? [[repo, cached.count]] : [];
+    });
+
+    if (cachedEntries.length) {
+      setStars(Object.fromEntries(cachedEntries));
+    }
+
+    const reposToRefresh = repos.filter((repo) => {
+      const cached = cachedByRepo[repo];
+      return !cached || now - cached.timestamp >= githubStarsCacheTtl;
+    });
+
+    if (!reposToRefresh.length) return undefined;
 
     const loadStars = async () => {
       const entries = await Promise.all(
-        repos.map(async (repo) => {
-          const cacheKey = `github-stars:${repo}`;
-
-          try {
-            const cached = JSON.parse(window.sessionStorage.getItem(cacheKey));
-            if (cached && Date.now() - cached.timestamp < cacheTtl) {
-              return [repo, cached.count];
-            }
-          } catch {
-            // Optional badge only.
-          }
-
+        reposToRefresh.map(async (repo) => {
           const controller = new AbortController();
           const timeout = window.setTimeout(() => controller.abort(), 3500);
           try {
@@ -720,11 +732,7 @@ function useGithubStars(papers) {
             const data = await response.json();
             const count = Number(data.stargazers_count);
             if (!Number.isFinite(count)) return null;
-            try {
-              window.sessionStorage.setItem(cacheKey, JSON.stringify({ count, timestamp: Date.now() }));
-            } catch {
-              // Optional cache only.
-            }
+            writeGithubStarsCache(repo, count);
             return [repo, count];
           } catch {
             return null;
@@ -734,20 +742,48 @@ function useGithubStars(papers) {
         })
       );
 
-      if (!cancelled) {
-        setStars(Object.fromEntries(entries.filter(Boolean)));
+      const liveEntries = entries.filter(Boolean);
+      if (!cancelled && liveEntries.length) {
+        setStars((currentStars) => ({
+          ...currentStars,
+          ...Object.fromEntries(liveEntries)
+        }));
       }
     };
 
-    const cleanupSchedule = runAfterInitialLoad(() => runWhenIdle(loadStars, 1200));
+    let cleanupIdle = () => {};
+    const cleanupLoad = runAfterInitialLoad(() => {
+      cleanupIdle = runWhenIdle(loadStars, 1200);
+    });
 
     return () => {
       cancelled = true;
-      cleanupSchedule();
+      cleanupLoad();
+      cleanupIdle();
     };
   }, [repos]);
 
   return stars;
+}
+
+function readGithubStarsCache(repo) {
+  try {
+    const cached = JSON.parse(window.sessionStorage.getItem(`github-stars:${repo}`));
+    const count = Number(cached?.count);
+    const timestamp = Number(cached?.timestamp);
+    if (!Number.isFinite(count) || !Number.isFinite(timestamp)) return null;
+    return { count, timestamp };
+  } catch {
+    return null;
+  }
+}
+
+function writeGithubStarsCache(repo, count) {
+  try {
+    window.sessionStorage.setItem(`github-stars:${repo}`, JSON.stringify({ count, timestamp: Date.now() }));
+  } catch {
+    // Optional cache only.
+  }
 }
 
 function getGithubRepo(href) {

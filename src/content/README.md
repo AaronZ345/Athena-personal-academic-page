@@ -79,7 +79,7 @@ GitHub links can include `stars` as a numeric fallback:
 { label: "Code", href: "https://github.com/owner/repo", stars: 128 }
 ```
 
-Configured star counts render immediately and are not fetched from the GitHub API. This keeps badges visible when anonymous GitHub API requests are rate-limited.
+Configured star counts render immediately as a fallback. GitHub badges still refresh from the GitHub API after the initial page load when the short session cache is missing or stale, and keep the fallback value if anonymous GitHub API requests are rate-limited.
 
 Profile link icon keys include `Email`, `Scholar`, `ORCID`, `DBLP`, `GitHub`, `LinkedIn`, `Website`, `Lab`, `CV`, and `HuggingFace`.
 
