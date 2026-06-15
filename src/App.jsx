@@ -704,7 +704,7 @@ function useGithubStars(papers) {
 
     const cachedEntries = repos.flatMap((repo) => {
       const cached = cachedByRepo[repo];
-      return cached ? [[repo, cached.count]] : [];
+      return cached && typeof cached.count === "number" ? [[repo, cached.count]] : [];
     });
 
     if (cachedEntries.length) {
@@ -713,7 +713,7 @@ function useGithubStars(papers) {
 
     const reposToRefresh = repos.filter((repo) => {
       const cached = cachedByRepo[repo];
-      return !cached || now - cached.timestamp >= githubStarsCacheTtl;
+      return !cached || now - cached.checkedAt >= githubStarsCacheTtl;
     });
 
     if (!reposToRefresh.length) return undefined;
@@ -728,13 +728,17 @@ function useGithubStars(papers) {
               headers: { Accept: "application/vnd.github+json" },
               signal: controller.signal
             });
-            if (!response.ok) return null;
+            if (!response.ok) {
+              markGithubStarsCacheChecked(repo, cachedByRepo[repo]);
+              return null;
+            }
             const data = await response.json();
             const count = Number(data.stargazers_count);
             if (!Number.isFinite(count)) return null;
             writeGithubStarsCache(repo, count);
             return [repo, count];
           } catch {
+            markGithubStarsCacheChecked(repo, cachedByRepo[repo]);
             return null;
           } finally {
             window.clearTimeout(timeout);
@@ -767,23 +771,54 @@ function useGithubStars(papers) {
 }
 
 function readGithubStarsCache(repo) {
+  const key = getGithubStarsCacheKey(repo);
+  return readGithubStarsCacheStorage("localStorage", key)
+    ?? readGithubStarsCacheStorage("sessionStorage", key);
+}
+
+function writeGithubStarsCache(repo, count) {
+  const now = Date.now();
+  writeGithubStarsCacheEntry(repo, { count, updatedAt: now, checkedAt: now });
+}
+
+function markGithubStarsCacheChecked(repo, cached) {
+  if (!cached) return;
+  writeGithubStarsCacheEntry(repo, { ...cached, checkedAt: Date.now() });
+}
+
+function writeGithubStarsCacheEntry(repo, entry) {
+  const key = getGithubStarsCacheKey(repo);
+  if (writeGithubStarsCacheStorage("localStorage", key, entry)) return;
+  if (!writeGithubStarsCacheStorage("sessionStorage", key, entry)) {
+    // Optional cache only.
+  }
+}
+
+function readGithubStarsCacheStorage(storageName, key) {
   try {
-    const cached = JSON.parse(window.sessionStorage.getItem(`github-stars:${repo}`));
+    const storage = window[storageName];
+    const cached = JSON.parse(storage.getItem(key));
     const count = Number(cached?.count);
-    const timestamp = Number(cached?.timestamp);
-    if (!Number.isFinite(count) || !Number.isFinite(timestamp)) return null;
-    return { count, timestamp };
+    const updatedAt = Number(cached?.updatedAt ?? cached?.timestamp);
+    const checkedAt = Number(cached?.checkedAt ?? updatedAt);
+    if (!Number.isFinite(count) || !Number.isFinite(updatedAt) || !Number.isFinite(checkedAt)) return null;
+    return { count, updatedAt, checkedAt };
   } catch {
     return null;
   }
 }
 
-function writeGithubStarsCache(repo, count) {
+function writeGithubStarsCacheStorage(storageName, key, entry) {
   try {
-    window.sessionStorage.setItem(`github-stars:${repo}`, JSON.stringify({ count, timestamp: Date.now() }));
+    window[storageName].setItem(key, JSON.stringify(entry));
+    return true;
   } catch {
-    // Optional cache only.
+    return false;
   }
+}
+
+function getGithubStarsCacheKey(repo) {
+  return `github-stars:${repo}`;
 }
 
 function getGithubRepo(href) {
