@@ -28,13 +28,13 @@ import {
 } from "./icons.js";
 
 const chartColors = ["#245a96", "#5c9ec6", "#7a8f36", "#b66f36", "#7b6fb3", "#3f8b78", "#b75d69"];
-const githubStarsCacheTtl = 1000 * 60 * 5;
+const githubStatsCacheTtl = 1000 * 60 * 5;
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
-  const starSources = useMemo(() => [...publications, ...projects], []);
-  const githubStars = useGithubStars(starSources);
+  const githubStatsSources = useMemo(() => [publications, projects], []);
+  const githubStats = useGithubRepoStats(githubStatsSources);
   const stats = useMemo(() => getPublicationStats(publications), []);
   const groups = useMemo(() => getPublicationGroups(publications, publicationGroups), []);
   const visibleSections = useMemo(() => sections.filter((section) => section.enabled !== false), []);
@@ -73,10 +73,10 @@ function App() {
         key={group}
         title={group}
         papers={publications.filter((paper) => paper.group === group)}
-        githubStars={githubStars}
+        githubStats={githubStats}
       />
     )),
-    projects: <ProjectList items={projects} githubStars={githubStars} />,
+    projects: <ProjectList items={projects} githubStats={githubStats} />,
     teaching: <Timeline items={teaching} />,
     talks: <Timeline items={talks} />,
     education: <Timeline items={education} />,
@@ -353,7 +353,7 @@ function DonutChart({ title, data }) {
   );
 }
 
-function PublicationGroup({ title, papers, githubStars }) {
+function PublicationGroup({ title, papers, githubStats }) {
   const highlighted = papers.filter((paper) => paper.featured);
   const compact = papers.filter((paper) => !paper.featured);
 
@@ -366,14 +366,14 @@ function PublicationGroup({ title, papers, githubStars }) {
       {highlighted.length ? (
         <div className="highlight-list">
           {highlighted.map((paper) => (
-            <FeaturedPaper key={paper.title} paper={paper} githubStars={githubStars} />
+            <FeaturedPaper key={paper.title} paper={paper} githubStats={githubStats} />
           ))}
         </div>
       ) : null}
       {compact.length ? (
         <div className="compact-paper-list">
           {compact.map((paper) => (
-            <CompactPaper key={paper.title} paper={paper} githubStars={githubStars} />
+            <CompactPaper key={paper.title} paper={paper} githubStats={githubStats} />
           ))}
         </div>
       ) : null}
@@ -381,7 +381,7 @@ function PublicationGroup({ title, papers, githubStars }) {
   );
 }
 
-function FeaturedPaper({ paper, githubStars }) {
+function FeaturedPaper({ paper, githubStats }) {
   return (
     <article className="featured-paper">
       <PublicationVisual paper={paper} />
@@ -391,7 +391,7 @@ function FeaturedPaper({ paper, githubStars }) {
         <p className="authors">{highlightAuthors(paper.authors)}</p>
         {paper.summary ? <p>{paper.summary}</p> : null}
         {paper.tags?.length ? <TagList items={paper.tags} className="paper-tags" /> : null}
-        <ActionLinks links={paper.links} githubStars={githubStars} />
+        <ActionLinks links={paper.links} githubStats={githubStats} />
       </div>
     </article>
   );
@@ -416,7 +416,7 @@ function PublicationVisual({ paper }) {
   );
 }
 
-function CompactPaper({ paper, githubStars }) {
+function CompactPaper({ paper, githubStats }) {
   return (
     <article className="compact-paper-row">
       <PublicationMeta paper={paper} compact />
@@ -425,7 +425,7 @@ function CompactPaper({ paper, githubStars }) {
         <p className="authors">{highlightAuthors(paper.authors)}</p>
         {paper.tags?.length ? <TagList items={paper.tags.slice(0, 4)} className="paper-tags" /> : null}
       </div>
-      <ActionLinks links={paper.links} githubStars={githubStars} />
+      <ActionLinks links={paper.links} githubStats={githubStats} />
     </article>
   );
 }
@@ -443,7 +443,7 @@ function PublicationMeta({ paper, compact = false }) {
   );
 }
 
-function ProjectList({ items, githubStars }) {
+function ProjectList({ items, githubStats }) {
   return (
     <div className="project-grid">
       {items.map((project) => (
@@ -459,7 +459,7 @@ function ProjectList({ items, githubStars }) {
           </div>
           <p>{project.summary}</p>
           {project.tags?.length ? <TagList items={project.tags} className="project-tags" /> : null}
-          <ActionLinks links={project.links} githubStars={githubStars} />
+          <ActionLinks links={project.links} githubStats={githubStats} />
         </article>
       ))}
     </div>
@@ -512,22 +512,23 @@ function TagList({ items, className }) {
   );
 }
 
-function ActionLinks({ links, githubStars = {} }) {
+function ActionLinks({ links, githubStats = {} }) {
   if (!links?.length) return null;
 
   return (
     <div className="action-links">
       {links.map((link) => {
         const githubRepo = getGithubRepo(link.href);
-        const liveStars = githubRepo ? githubStars[githubRepo] : undefined;
-        const fallbackStars = typeof link.stars === "number" ? link.stars : undefined;
-        const stars = liveStars ?? fallbackStars;
+        const showStats = Boolean(githubRepo && shouldShowGithubStats(link));
+        const stats = showStats
+          ? mergeGithubStats(githubStats[githubRepo], getGithubStatsFallback(link))
+          : null;
 
         return (
           <a key={`${link.label}-${link.href}`} href={link.href} target="_blank" rel="noreferrer">
             <i className={getActionIcon(link)} aria-hidden="true" />
             <span>{link.label}</span>
-            {githubRepo ? <GithubStars repo={githubRepo} stars={stars} /> : null}
+            {showStats ? <GithubRepoStats stats={stats} /> : null}
           </a>
         );
       })}
@@ -535,13 +536,23 @@ function ActionLinks({ links, githubStars = {} }) {
   );
 }
 
-function GithubStars({ stars }) {
-  if (typeof stars !== "number") return null;
+function GithubRepoStats({ stats }) {
+  if (!stats || (typeof stats.stars !== "number" && typeof stats.forks !== "number")) return null;
 
   return (
-    <span className="star-count" title={`${stars.toLocaleString()} GitHub stars`}>
-      <i className="fa-solid fa-star" aria-hidden="true" />
-      {formatStars(stars)}
+    <span className="repo-stats">
+      {typeof stats.stars === "number" ? (
+        <span className="repo-stat" title={`${stats.stars.toLocaleString()} GitHub stars`}>
+          <i className="fa-solid fa-star" aria-hidden="true" />
+          {formatGithubCount(stats.stars)}
+        </span>
+      ) : null}
+      {typeof stats.forks === "number" ? (
+        <span className="repo-stat" title={`${stats.forks.toLocaleString()} GitHub forks`}>
+          <i className="fa-solid fa-code-fork" aria-hidden="true" />
+          {formatGithubCount(stats.forks)}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -677,48 +688,54 @@ function renderRichText(content) {
   });
 }
 
-function useGithubStars(papers) {
+function useGithubRepoStats(collections) {
   const repos = useMemo(() => {
     const found = new Set();
-    papers.forEach((paper) => {
-      paper.links?.forEach((link) => {
-        const repo = getGithubRepo(link.href);
-        if (repo) found.add(repo);
+    collections.forEach((items) => {
+      items.forEach((item) => {
+        item.links?.forEach((link) => {
+          const repo = getGithubRepo(link.href);
+          if (repo && shouldShowGithubStats(link)) {
+            found.add(repo);
+          }
+        });
       });
     });
     return Array.from(found);
-  }, [papers]);
-  const [stars, setStars] = useState({});
+  }, [collections]);
+  const [repoStats, setRepoStats] = useState({});
 
   useEffect(() => {
     if (!repos.length) {
-      setStars({});
+      setRepoStats({});
       return undefined;
     }
 
     let cancelled = false;
     const now = Date.now();
     const cachedByRepo = Object.fromEntries(
-      repos.map((repo) => [repo, readGithubStarsCache(repo)])
+      repos.map((repo) => [repo, readGithubStatsCache(repo)])
     );
 
     const cachedEntries = repos.flatMap((repo) => {
       const cached = cachedByRepo[repo];
-      return cached && typeof cached.count === "number" ? [[repo, cached.count]] : [];
+      return cached ? [[repo, cached]] : [];
     });
 
     if (cachedEntries.length) {
-      setStars(Object.fromEntries(cachedEntries));
+      setRepoStats(Object.fromEntries(cachedEntries));
     }
 
     const reposToRefresh = repos.filter((repo) => {
       const cached = cachedByRepo[repo];
-      return !cached || now - cached.checkedAt >= githubStarsCacheTtl;
+      // Template placeholder repos render fallback counts without noisy API errors.
+      if (isPlaceholderGithubRepo(repo)) return false;
+      return !cached || now - cached.checkedAt >= githubStatsCacheTtl;
     });
 
     if (!reposToRefresh.length) return undefined;
 
-    const loadStars = async () => {
+    const loadStats = async () => {
       const entries = await Promise.all(
         reposToRefresh.map(async (repo) => {
           const controller = new AbortController();
@@ -729,16 +746,19 @@ function useGithubStars(papers) {
               signal: controller.signal
             });
             if (!response.ok) {
-              markGithubStarsCacheChecked(repo, cachedByRepo[repo]);
+              markGithubStatsCacheChecked(repo, cachedByRepo[repo]);
               return null;
             }
             const data = await response.json();
-            const count = Number(data.stargazers_count);
-            if (!Number.isFinite(count)) return null;
-            writeGithubStarsCache(repo, count);
-            return [repo, count];
+            const stats = normalizeGithubStats({
+              stars: data.stargazers_count,
+              forks: data.forks_count
+            });
+            if (!stats) return null;
+            writeGithubStatsCache(repo, stats);
+            return [repo, stats];
           } catch {
-            markGithubStarsCacheChecked(repo, cachedByRepo[repo]);
+            markGithubStatsCacheChecked(repo, cachedByRepo[repo]);
             return null;
           } finally {
             window.clearTimeout(timeout);
@@ -748,8 +768,8 @@ function useGithubStars(papers) {
 
       const liveEntries = entries.filter(Boolean);
       if (!cancelled && liveEntries.length) {
-        setStars((currentStars) => ({
-          ...currentStars,
+        setRepoStats((currentStats) => ({
+          ...currentStats,
           ...Object.fromEntries(liveEntries)
         }));
       }
@@ -757,7 +777,7 @@ function useGithubStars(papers) {
 
     let cleanupIdle = () => {};
     const cleanupLoad = runAfterInitialLoad(() => {
-      cleanupIdle = runWhenIdle(loadStars, 1200);
+      cleanupIdle = runWhenIdle(loadStats, 1200);
     });
 
     return () => {
@@ -767,48 +787,54 @@ function useGithubStars(papers) {
     };
   }, [repos]);
 
-  return stars;
+  return repoStats;
 }
 
-function readGithubStarsCache(repo) {
-  const key = getGithubStarsCacheKey(repo);
-  return readGithubStarsCacheStorage("localStorage", key)
-    ?? readGithubStarsCacheStorage("sessionStorage", key);
+function readGithubStatsCache(repo) {
+  const key = getGithubStatsCacheKey(repo);
+  const legacyKey = getLegacyStarCacheKey(repo);
+  return readGithubStatsCacheStorage("localStorage", key)
+    ?? readGithubStatsCacheStorage("sessionStorage", key)
+    ?? readGithubStatsCacheStorage("localStorage", legacyKey)
+    ?? readGithubStatsCacheStorage("sessionStorage", legacyKey);
 }
 
-function writeGithubStarsCache(repo, count) {
+function writeGithubStatsCache(repo, stats) {
   const now = Date.now();
-  writeGithubStarsCacheEntry(repo, { count, updatedAt: now, checkedAt: now });
+  writeGithubStatsCacheEntry(repo, { ...stats, updatedAt: now, checkedAt: now });
 }
 
-function markGithubStarsCacheChecked(repo, cached) {
+function markGithubStatsCacheChecked(repo, cached) {
   if (!cached) return;
-  writeGithubStarsCacheEntry(repo, { ...cached, checkedAt: Date.now() });
+  writeGithubStatsCacheEntry(repo, { ...cached, checkedAt: Date.now() });
 }
 
-function writeGithubStarsCacheEntry(repo, entry) {
-  const key = getGithubStarsCacheKey(repo);
-  if (writeGithubStarsCacheStorage("localStorage", key, entry)) return;
-  if (!writeGithubStarsCacheStorage("sessionStorage", key, entry)) {
+function writeGithubStatsCacheEntry(repo, entry) {
+  const key = getGithubStatsCacheKey(repo);
+  if (writeGithubStatsCacheStorage("localStorage", key, entry)) return;
+  if (!writeGithubStatsCacheStorage("sessionStorage", key, entry)) {
     // Optional cache only.
   }
 }
 
-function readGithubStarsCacheStorage(storageName, key) {
+function readGithubStatsCacheStorage(storageName, key) {
   try {
     const storage = window[storageName];
     const cached = JSON.parse(storage.getItem(key));
-    const count = Number(cached?.count);
+    const stats = normalizeGithubStats({
+      stars: cached?.stars ?? cached?.count,
+      forks: cached?.forks
+    });
     const updatedAt = Number(cached?.updatedAt ?? cached?.timestamp);
     const checkedAt = Number(cached?.checkedAt ?? updatedAt);
-    if (!Number.isFinite(count) || !Number.isFinite(updatedAt) || !Number.isFinite(checkedAt)) return null;
-    return { count, updatedAt, checkedAt };
+    if (!stats || !Number.isFinite(updatedAt) || !Number.isFinite(checkedAt)) return null;
+    return { ...stats, updatedAt, checkedAt };
   } catch {
     return null;
   }
 }
 
-function writeGithubStarsCacheStorage(storageName, key, entry) {
+function writeGithubStatsCacheStorage(storageName, key, entry) {
   try {
     window[storageName].setItem(key, JSON.stringify(entry));
     return true;
@@ -817,8 +843,44 @@ function writeGithubStarsCacheStorage(storageName, key, entry) {
   }
 }
 
-function getGithubStarsCacheKey(repo) {
+function getGithubStatsCacheKey(repo) {
+  return `github-repo-stats:${repo}`;
+}
+
+function getLegacyStarCacheKey(repo) {
   return `github-stars:${repo}`;
+}
+
+function shouldShowGithubStats(link) {
+  if (link.showGithubStats === false || link.stats === false) return false;
+  if (link.showGithubStats === true || link.stats === true) return true;
+  const label = String(link.label ?? "").toLowerCase();
+  return ["code", "github", "repo", "repository"].some((keyword) => label.includes(keyword));
+}
+
+function getGithubStatsFallback(link) {
+  return normalizeGithubStats({
+    stars: link.stars,
+    forks: link.forks
+  });
+}
+
+function mergeGithubStats(liveStats, fallbackStats) {
+  return normalizeGithubStats({
+    stars: liveStats?.stars ?? fallbackStats?.stars,
+    forks: liveStats?.forks ?? fallbackStats?.forks
+  });
+}
+
+function normalizeGithubStats(stats) {
+  const normalized = {};
+  const stars = Number(stats?.stars);
+  const forks = Number(stats?.forks);
+
+  if (Number.isFinite(stars)) normalized.stars = stars;
+  if (Number.isFinite(forks)) normalized.forks = forks;
+
+  return Object.keys(normalized).length ? normalized : null;
 }
 
 function getGithubRepo(href) {
@@ -831,6 +893,10 @@ function getGithubRepo(href) {
   } catch {
     return null;
   }
+}
+
+function isPlaceholderGithubRepo(repo) {
+  return repo.split("/")[0]?.toLowerCase() === "example";
 }
 
 function highlightAuthors(authors = "") {
@@ -898,7 +964,7 @@ function formatNumber(value) {
   return new Intl.NumberFormat("en").format(value);
 }
 
-function formatStars(value) {
+function formatGithubCount(value) {
   if (value >= 1000) {
     const rounded = Math.round((value / 1000) * 10) / 10;
     return `${rounded.toString().replace(/\.0$/, "")}k`;

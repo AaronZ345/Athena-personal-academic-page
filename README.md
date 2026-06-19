@@ -10,7 +10,7 @@ The name keeps the Greek deity convention while making the repository purpose ex
 - Light and dark themes with system-theme detection and a manual toggle.
 - Polished UI details: soft surfaces, subtle shadows, hover states, semantic section icons, rounded media frames, compact action chips, and mobile-safe typography.
 - Publication analytics generated from `src/content/publications.js`: yearly count, research area distribution, publication type, venue family, selected papers, and open artifacts.
-- Publication and project cards with featured figures, tags, artifact links, inferred action icons, optional GitHub star badges, and grouped paper sections.
+- Publication and project cards with featured figures, tags, artifact links, inferred action icons, optional GitHub star/fork badges, and grouped paper sections.
 - Configurable sections for news, projects, teaching, talks, education, experience, awards, and academic service.
 - SEO and social preview metadata injected from `src/content/site.js`.
 - GitHub Pages deployment workflow included.
@@ -106,13 +106,15 @@ Publication and project link icons are inferred from labels. These labels work o
 
 `Paper`, `Code`, `Dataset`, `Demo`, `Slides`, `Video`, `DOI`, `BibTeX`, `Poster`, `Documentation`, `Project`, and `Download`.
 
-For GitHub links, add a numeric `stars` field when you want a reliable fallback badge without depending on the GitHub API:
+For GitHub repository links, add numeric `stars` and `forks` fields when you want reliable fallback badges without depending on the GitHub API:
 
 ```js
-{ label: "Code", href: "https://github.com/owner/repo", stars: 128 }
+{ label: "Code", href: "https://github.com/owner/repo", stars: 128, forks: 24 }
 ```
 
-Links with `stars` set render immediately and are skipped by the live GitHub star loader, which avoids blank badges when the GitHub API is rate-limited.
+Fallback counts render immediately. Repository badges refresh from the GitHub API after the initial page load when the persistent browser cache is missing or stale, and keep the last successful cached value when anonymous GitHub API requests are rate-limited.
+
+By default, GitHub stats only appear on repository-style links such as `Code`, `GitHub`, `Repo`, or `Repository`. Release, documentation, and demo links stay clean unless you set `showGithubStats: true`.
 
 Profile link icon keys include:
 

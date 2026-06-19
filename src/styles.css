@@ -167,6 +167,10 @@
   --fa: "\f121";
 }
 
+.fa-code-fork {
+  --fa: "\e13b";
+}
+
 .fa-database {
   --fa: "\f1c0";
 }
@@ -1219,10 +1223,10 @@ input {
   text-align: center;
 }
 
-.star-count {
+.repo-stats {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 6px;
   margin-left: 2px;
   padding-left: 7px;
   border-left: 1px solid var(--border);
@@ -1231,7 +1235,13 @@ input {
   font-weight: 500;
 }
 
-.star-count i {
+.repo-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.repo-stat i {
   color: var(--subtle);
   font-size: 0.74rem;
 }
@@ -1311,7 +1321,7 @@ input {
   color: var(--blue);
 }
 
-.compact-paper-row .star-count {
+.compact-paper-row .repo-stats {
   margin-left: 0;
   padding-left: 3px;
   border-left: 0;
@@ -1329,6 +1339,10 @@ input {
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 9px;
+}
+
+.project-tags {
+  margin-top: 13px;
 }
 
 .paper-tags span,
@@ -1350,14 +1364,13 @@ input {
 }
 
 .project-card {
-  display: grid;
-  align-content: start;
-  gap: 10px;
-  min-height: 236px;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
   border: 1px solid var(--border);
   border-left: 3px solid var(--blue);
   border-radius: var(--radius);
-  background: var(--panel-bg);
+  background: var(--featured-bg);
   box-shadow: var(--subtle-shadow);
   padding: 16px;
   transition:
@@ -1376,8 +1389,10 @@ input {
 }
 
 .project-card-head {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .project-card h3 {
@@ -1390,18 +1405,19 @@ input {
 }
 
 .project-status {
-  width: fit-content;
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 6px;
-  border: 1px solid var(--border-soft);
+  margin-top: 7px;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--surface);
-  color: var(--venue-text);
+  background: var(--chip-bg);
+  color: var(--blue);
   font-size: 0.72rem;
   font-weight: 560;
-  line-height: 1;
-  padding: 5px 8px;
+  line-height: 1.2;
+  padding: 4px 8px;
 }
 
 .project-status .semantic-icon {
@@ -1410,14 +1426,15 @@ input {
 }
 
 .project-card p {
-  margin: 0;
+  margin: 12px 0 0;
   color: var(--muted);
   font-size: 0.84rem;
-  line-height: 1.52;
+  line-height: 1.56;
 }
 
 .project-card .action-links {
   margin-top: auto;
+  padding-top: 14px;
 }
 
 .timeline {

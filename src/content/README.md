@@ -73,13 +73,15 @@ Most text fields can be plain strings. For text with links or bold spans, use an
 
 Publication/project link icons are inferred from labels such as `Paper`, `Code`, `Dataset`, `Demo`, `Slides`, `Video`, `DOI`, `BibTeX`, `Poster`, `Documentation`, and `Download`.
 
-GitHub links can include `stars` as a numeric fallback:
+GitHub repository links can include `stars` and `forks` as numeric fallbacks:
 
 ```js
-{ label: "Code", href: "https://github.com/owner/repo", stars: 128 }
+{ label: "Code", href: "https://github.com/owner/repo", stars: 128, forks: 24 }
 ```
 
-Configured star counts render immediately as a fallback. GitHub badges still refresh from the GitHub API after the initial page load when the persistent browser cache is missing or stale, and keep the last successful cached value when anonymous GitHub API requests are rate-limited.
+Configured counts render immediately as a fallback. GitHub badges still refresh from the GitHub API after the initial page load when the persistent browser cache is missing or stale, and keep the last successful cached value when anonymous GitHub API requests are rate-limited.
+
+Stats appear by default on repository-style links such as `Code`, `GitHub`, `Repo`, or `Repository`. Set `showGithubStats: false` to suppress them, or `showGithubStats: true` to show them on another GitHub link.
 
 Profile link icon keys include `Email`, `Scholar`, `ORCID`, `DBLP`, `GitHub`, `LinkedIn`, `Website`, `Lab`, `CV`, and `HuggingFace`.
 

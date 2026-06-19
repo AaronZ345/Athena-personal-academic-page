@@ -1,24 +1,24 @@
 export const projects = [
   {
-    title: "Athena Personal Academic Page",
+    title: "Open Research Toolkit",
     status: "Active",
     summary:
-      "A reusable academic website framework with configurable sections, publication analytics, and GitHub Pages deployment.",
-    tags: ["React", "Vite", "Academic Website"],
+      "A reusable research software project with documentation, reproducible examples, releases, and an academic artifact trail.",
+    tags: ["Research Software", "Reproducibility", "Documentation"],
     links: [
-      { label: "Code", href: "https://github.com/AaronZ345/Athena-personal-academic-page", stars: 27 },
-      { label: "Documentation", href: "https://example.com/docs" }
+      { label: "Code", href: "https://github.com/example/open-research-toolkit", stars: 128, forks: 24 },
+      { label: "Release", href: "https://github.com/example/open-research-toolkit/releases" }
     ]
   },
   {
-    title: "Research Artifact Registry",
+    title: "Dataset Explorer",
     status: "Prototype",
     summary:
-      "A catalog for papers, datasets, demos, talks, and reproducibility assets with clear ownership and release status.",
-    tags: ["Open Science", "Metadata", "Artifacts"],
+      "An interactive project page for dataset cards, benchmark splits, model outputs, and reproducibility notes.",
+    tags: ["Dataset", "Benchmark", "Demo"],
     links: [
-      { label: "Project", href: "https://example.com/registry" },
-      { label: "Demo", href: "https://example.com/registry-demo" }
+      { label: "Code", href: "https://github.com/example/dataset-explorer", stars: 64, forks: 9 },
+      { label: "Demo", href: "https://example.com/dataset-explorer" }
     ]
   },
   {
