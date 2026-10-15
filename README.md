@@ -53,6 +53,8 @@ Keeping the repository name is also fine; GitHub Pages will publish it at `https
 
 ### 2. Run it locally
 
+Install [Node.js 22 LTS](https://nodejs.org/) to match the deployment workflow, then run:
+
 ```bash
 npm ci
 npm run dev
@@ -78,6 +80,78 @@ Most users only need to edit `src/content/` and add images to `public/images/`.
 The [content reference](src/content/README.md) documents every field, including publication grouping, rich text fragments, card selection, image paths, and project layout.
 
 For a first publish, start with `profile.js`, `publications.js`, and `site.js`. The remaining sections can stay as examples or be disabled from the `sections` array until you need them.
+
+## Add content
+
+Add an object to the existing exported array in the relevant file. Each example below shows one new entry followed by a place for your existing entries. Keep one `export const ...` per file and a comma between objects. Replace the sample text and URLs with your own.
+
+These updates only need content files. The page components in `src/App.jsx` read the arrays and render them in the existing layout.
+
+### Add a publication
+
+In [`src/content/publications.js`](src/content/publications.js):
+
+```js
+export const publications = [
+  {
+    title: "Evaluating Research Assistants",
+    venue: "Preprint",
+    year: "2026",
+    type: "Report",
+    group: "Machine Learning",
+    authors: "Researcher Name, Collaborator A",
+    links: [
+      { label: "Paper", href: "https://example.com/research-assistants.pdf" },
+      { label: "Code", href: "https://github.com/USERNAME/research-assistants" }
+    ]
+  },
+  // Keep your other publications here.
+];
+```
+
+This creates a compact row. Use an existing `group` name, or add your own to `publicationGroups` in `src/content/site.js` to choose its position. Add `featured: true` and a `summary` for a large card; an optional `image` can point to a file such as `"images/my-paper.svg"` under `public/`. See [Publications](#publications) for ordering and [Images](#images) for supported image paths.
+
+### Add a project
+
+In [`src/content/projects.js`](src/content/projects.js):
+
+```js
+export const projects = [
+  {
+    title: "Research Assistant Toolkit",
+    status: "Active",
+    summary: "Scripts and evaluation data for comparing research assistants.",
+    tags: ["Evaluation", "Open Source"],
+    links: [
+      { label: "Code", href: "https://github.com/USERNAME/research-assistants" },
+      { label: "Demo", href: "https://example.com/research-assistants" }
+    ]
+  },
+  // Keep your other projects here.
+];
+```
+
+Projects appear in array order, so put the new entry first to make it the first card.
+
+### Add a news item
+
+In [`src/content/news.js`](src/content/news.js):
+
+```js
+export const news = [
+  {
+    date: "2026.10",
+    icon: "release",
+    text: "The Research Assistant Toolkit is now available.",
+    href: "https://example.com/research-assistants"
+  },
+  // Keep your older news here.
+];
+```
+
+Keep news newest first; Athena displays the array as written and shows its first four entries in Profile Details. Use `YYYY.MM` for dates. Other icon names include `accepted`, `dataset`, `talk`, `award`, and `career`.
+
+Save the file and check the running local page. If a section is hidden, enable its entry in the `sections` array in `src/content/site.js`. Run `npm run build` before publishing to catch syntax errors.
 
 ## Publications
 
@@ -137,14 +211,69 @@ The fallback appears immediately. Athena refreshes it from the GitHub API when t
 
 ## Deploy with GitHub Pages
 
+### Choose your site address
+
+GitHub Pages supports a site at the account root or under a repository name. Replace `USERNAME` with your GitHub username; `academic-site` below is an example repository name.
+
+| Deployment | Repository name | Published URL | Vite base path |
+| --- | --- | --- | --- |
+| User or organization site | `USERNAME.github.io` | `https://USERNAME.github.io/` | `/` |
+| Project site | `academic-site` | `https://USERNAME.github.io/academic-site/` | `/academic-site/` |
+
+The base path is the prefix used for built assets such as JavaScript, CSS, and icons. A project site built with `/` requests files from the account root, where they may return 404.
+
+[`vite.config.js`](vite.config.js) reads `GITHUB_REPOSITORY`, which GitHub Actions sets to `OWNER/REPOSITORY`. It chooses `/` when the repository is named after its owner as `OWNER.github.io`, and `/REPOSITORY/` otherwise. Both standard Pages setups work with the included workflow without editing Vite configuration.
+
+### Set your public URLs
+
+Update these fields inside the existing `siteMeta` object in [`src/content/site.js`](src/content/site.js), keeping its other fields. For a user site:
+
+```js
+url: "https://USERNAME.github.io/",
+image: "https://USERNAME.github.io/images/athena-og.svg",
+repositoryUrl: "https://github.com/USERNAME/USERNAME.github.io"
+```
+
+For a project site named `academic-site`:
+
+```js
+url: "https://USERNAME.github.io/academic-site/",
+image: "https://USERNAME.github.io/academic-site/images/athena-og.svg",
+repositoryUrl: "https://github.com/USERNAME/academic-site"
+```
+
+`url` and `image` are absolute URLs for search engines and social previews. Changing them does not change Vite's base path. When you replace the preview image, update `image` to its public URL too. Keep local content image paths relative, such as `"images/my-paper.svg"`, so they work under either base path.
+
+### Publish
+
 1. Open the repository's **Settings → Pages** page.
 2. Set **Build and deployment → Source** to **GitHub Actions**.
-3. Update `siteMeta.url`, `siteMeta.image`, and `siteMeta.repositoryUrl` in `src/content/site.js`.
-4. Push to `main`.
+3. Commit your content and metadata changes, then push or merge them into `main`.
+4. Open **Actions → Deploy Pages** and wait for both the build and deploy jobs to succeed. Open the published URL from **Settings → Pages**.
 
-The included [`pages.yml`](.github/workflows/pages.yml) workflow installs dependencies, builds `dist/`, and deploys it. Vite automatically uses `/` for `USERNAME.github.io` repositories and `/REPOSITORY/` for project Pages sites.
+The included [`pages.yml`](.github/workflows/pages.yml) workflow installs dependencies, builds `dist/`, and deploys it. If you use a different default branch, update `on.push.branches` in that workflow. You can also start a deployment from **Actions → Deploy Pages → Run workflow**.
 
-For a custom domain, set `siteMeta.url` to that domain before deploying.
+### Preview the deployment path locally
+
+Local development defaults to `/` when `GITHUB_REPOSITORY` is unset. To check a root site, run `npm run build` followed by `npm run preview` and open `http://127.0.0.1:4173/`.
+
+To check a project site before publishing, pass the same base path to both commands:
+
+```bash
+npm run build -- --base=/academic-site/
+npm run preview -- --base=/academic-site/
+```
+
+Open `http://127.0.0.1:4173/academic-site/`. Replace `academic-site` with your repository name, including its capitalization, and keep both slashes. Check that images, styles, and navigation load at that URL. A preview at `/` alone will not catch incorrect project paths.
+
+### Custom domains
+
+For a custom domain served from `/`, configure the domain in **Settings → Pages** and follow [GitHub's DNS setup instructions](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site). Set `siteMeta.url` and `siteMeta.image` to that domain, and override the build step in `.github/workflows/pages.yml` so a project repository does not keep its repository prefix:
+
+```yaml
+- name: Build
+  run: npm run build -- --base=/
+```
 
 ## Project map
 

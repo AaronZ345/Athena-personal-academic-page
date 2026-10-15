@@ -2,6 +2,8 @@
 
 The files in this folder are the editable data layer for Athena. Most personal sites only need changes under `src/content/` and image files under `public/images/`.
 
+For a first edit, follow the [publication, project, and news examples](../../README.md#add-content). The [GitHub Pages guide](../../README.md#deploy-with-github-pages) covers root sites, repository subpaths, and local previews.
+
 Start with these files:
 
 1. `profile.js`
