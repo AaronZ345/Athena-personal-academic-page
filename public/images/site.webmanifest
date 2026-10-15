@@ -3,7 +3,7 @@
   "short_name": "Athena Page",
   "icons": [
     {
-      "src": "/images/athena-mark.svg",
+      "src": "athena-mark.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

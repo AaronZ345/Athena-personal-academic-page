@@ -226,11 +226,13 @@ The base path is the prefix used for built assets such as JavaScript, CSS, and i
 
 ### Set your public URLs
 
+Save a PNG or JPEG social preview image under `public/images/`. The examples below assume you have added `public/images/social-preview.png`; use your own filename if different.
+
 Update these fields inside the existing `siteMeta` object in [`src/content/site.js`](src/content/site.js), keeping its other fields. For a user site:
 
 ```js
 url: "https://USERNAME.github.io/",
-image: "https://USERNAME.github.io/images/athena-og.svg",
+image: "https://USERNAME.github.io/images/social-preview.png",
 repositoryUrl: "https://github.com/USERNAME/USERNAME.github.io"
 ```
 
@@ -238,7 +240,7 @@ For a project site named `academic-site`:
 
 ```js
 url: "https://USERNAME.github.io/academic-site/",
-image: "https://USERNAME.github.io/academic-site/images/athena-og.svg",
+image: "https://USERNAME.github.io/academic-site/images/social-preview.png",
 repositoryUrl: "https://github.com/USERNAME/academic-site"
 ```
 

@@ -26,10 +26,12 @@ Run `npm run build` after editing. JavaScript syntax errors, missing exports, an
 | `description` | Yes | Standard HTML description. |
 | `socialDescription` | Yes | Open Graph and Twitter description. |
 | `url` | Yes | Public canonical site URL, preferably with a trailing slash. |
-| `image` | Yes | Absolute public URL for the social preview image. |
+| `image` | Yes | Absolute public URL for a PNG or JPEG social preview image. |
 | `repositoryUrl` | No | Repository linked by “Built with Athena” in the footer. Use an empty string to hide the link. |
 
 Use absolute URLs for `url` and `image`; social crawlers do not reliably resolve local development paths.
+
+Add your social preview image to `public/images/` and set `image` to its published URL, including the repository subpath for a project site. Use PNG or JPEG for sharing previews; the bundled SVG illustrations can still be used within the page.
 
 ### `sections`
 
