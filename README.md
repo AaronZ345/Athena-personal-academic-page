@@ -49,7 +49,7 @@ git clone https://github.com/USERNAME/USERNAME.github.io.git
 cd USERNAME.github.io
 ```
 
-Keeping the repository name is also fine; GitHub Pages will publish it at `https://USERNAME.github.io/REPOSITORY/`.
+For a project site, replace `USERNAME.github.io` with your repository name in both commands. GitHub Pages will publish it at `https://USERNAME.github.io/REPOSITORY/`.
 
 ### 2. Run it locally
 
@@ -251,7 +251,9 @@ repositoryUrl: "https://github.com/USERNAME/academic-site"
 3. Commit your content and metadata changes, then push or merge them into `main`.
 4. Open **Actions → Deploy Pages** and wait for both the build and deploy jobs to succeed. Open the published URL from **Settings → Pages**.
 
-The included [`pages.yml`](.github/workflows/pages.yml) workflow installs dependencies, builds `dist/`, and deploys it. If you use a different default branch, update `on.push.branches` in that workflow. You can also start a deployment from **Actions → Deploy Pages → Run workflow**.
+The included [`pages.yml`](.github/workflows/pages.yml) workflow installs dependencies, builds `dist/`, and deploys it. If you use a different default branch, update `on.push.branches` in that workflow.
+
+For a manual deployment, open **Actions → Deploy Pages → Run workflow** and select `main` (or your default branch) to build its latest commit. Selecting an older branch publishes that branch's content to the same live site.
 
 ### Preview the deployment path locally
 
