@@ -2,6 +2,8 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { siteMeta } from "./src/content/site.js";
 
+const siteUrl = getSiteUrl();
+
 const siteMetaPlugin = {
   name: "site-meta",
   transformIndexHtml(html) {
@@ -9,8 +11,8 @@ const siteMetaPlugin = {
       "%SITE_TITLE%": siteMeta.title,
       "%SITE_DESCRIPTION%": siteMeta.description,
       "%SITE_SOCIAL_DESCRIPTION%": siteMeta.socialDescription,
-      "%SITE_URL%": siteMeta.url,
-      "%SITE_IMAGE%": siteMeta.image
+      "%SITE_URL%": siteUrl.href,
+      "%SITE_IMAGE%": new URL(siteMeta.image, siteUrl).href
     };
 
     return Object.entries(replacements).reduce(
@@ -28,17 +30,23 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;");
 }
 
-export default defineConfig({
-  base: getBasePath(),
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === "serve" && !isPreview ? "/" : siteUrl.pathname,
   plugins: [react(), siteMetaPlugin]
-});
+}));
 
-function getBasePath() {
-  const repository = process.env.GITHUB_REPOSITORY;
-  if (!repository) return "/";
+function getSiteUrl() {
+  if (siteMeta.url) {
+    const url = new URL(siteMeta.url);
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      throw new Error("siteMeta.url must be an http:// or https:// URL.");
+    }
+    if (!url.pathname.endsWith("/")) url.pathname += "/";
+    return url;
+  }
 
-  const [owner, repo] = repository.split("/");
-  if (!owner || !repo) return "/";
-  if (repo.toLowerCase() === `${owner.toLowerCase()}.github.io`) return "/";
-  return `/${repo}/`;
+  const [owner, repo] = (process.env.GITHUB_REPOSITORY ?? "").split("/");
+  if (!owner || !repo) return new URL("http://127.0.0.1:5173/");
+  const base = repo.toLowerCase() === `${owner.toLowerCase()}.github.io` ? "/" : `/${repo}/`;
+  return new URL(`https://${owner.toLowerCase()}.github.io${base}`);
 }

@@ -20,152 +20,137 @@
 </div>
 
 <a href="https://aaronz345.github.io/Athena-personal-academic-page/">
-  <img src="public/images/athena-og.svg" width="100%" alt="Preview of Athena Personal Academic Page" />
+  <img src="public/images/athena-og.png" width="100%" alt="Preview of Athena Personal Academic Page" />
 </a>
 
 Athena is a React and Vite template for maintaining an academic website without mixing content into page components. Profiles, publications, projects, teaching, talks, awards, service, and site metadata all live in small files under `src/content/`.
 
-## What is included
+## Make it yours
 
-| Area | What Athena provides |
+1. Click [Use this template](https://github.com/new?template_name=Athena-personal-academic-page&template_owner=AaronZ345). Name your repository `USERNAME.github.io` for an account homepage, or choose another name for a project site.
+2. Edit the files in `src/content/`. You can use GitHub's web editor or a local editor. Set your profile, publications, and the site title in `site.js`.
+3. In **Settings → Pages**, set **Source** to **GitHub Actions**. Push or merge your edits into `main`; the included workflow builds and publishes the site automatically.
+
+After setup, ordinary updates are just content edits and a commit. Local preview is optional.
+
+## What to edit
+
+| File under `src/content/` | Content |
 | --- | --- |
-| Research profile | Compact profile sidebar, research interests, contact links, CV, Scholar, ORCID, DBLP, GitHub, and more |
-| Publications | Grouped papers, featured cards, compact rows, figures, equal-contribution notes, artifact links, and automatic metrics |
-| Academic activity | News, projects, teaching, talks, education, experience, awards, and service sections |
-| Project links | Repository-aware action links with cached GitHub star counts and static fallbacks |
-| Presentation | Responsive desktop and mobile layouts, light and dark themes, sticky navigation, and accessible image fallbacks |
-| Publishing | SEO and social metadata plus a ready-to-run GitHub Pages workflow |
+| `profile.js` | Name, bio, affiliation, avatar, and contact links |
+| `publications.js` | Papers, authors, venues, groups, and links |
+| `projects.js` | Project cards and links |
+| `news.js` | News timeline |
+| `site.js` | Site title, section order, visibility, and optional custom domain |
+| `teaching.js`, `talks.js` | Teaching and talks |
+| `education.js`, `experience.js` | Education and positions |
+| `awards.js`, `services.js` | Honors and academic service |
 
-Section order, navigation labels, notes, and visibility are controlled from one array in `src/content/site.js`. There is no second navigation config to keep in sync.
+To hide an optional section, set `enabled: false` on its entry in `site.js`. Reorder the `sections` array to change the page and navigation order. The page components in `src/App.jsx` read these content files; ordinary content edits need no component changes.
 
-## Start in three steps
+## Add content
 
-### 1. Create your site
+Add an object inside the existing array in the named file. Keep your other entries after it, separated by commas. The examples show the surrounding export for context; each file needs only one export with that name.
 
-Click [Use this template](https://github.com/new?template_name=Athena-personal-academic-page&template_owner=AaronZ345) to create a clean repository without Athena's commit history. For a root GitHub Pages site, name it `USERNAME.github.io`.
+### Add a publication
 
-```bash
-git clone https://github.com/USERNAME/USERNAME.github.io.git
-cd USERNAME.github.io
+In [`src/content/publications.js`](src/content/publications.js):
+
+```js
+export const publications = [
+  {
+    title: "Evaluating Research Assistants",
+    venue: "Preprint",
+    year: "2026",
+    type: "Report",
+    group: "Machine Learning",
+    authors: "Researcher Name, Collaborator A",
+    links: [
+      { label: "Paper", href: "https://example.com/research-assistants.pdf" },
+      { label: "Code", href: "https://github.com/USERNAME/research-assistants" }
+    ]
+  },
+  // Keep your other publications here.
+];
 ```
 
-Keeping the repository name is also fine; GitHub Pages will publish it at `https://USERNAME.github.io/REPOSITORY/`.
+This creates a compact row. Use an existing `group`, or add your own to `publicationGroups` in `site.js` to choose its position. Add `featured: true` for a large card. Featured papers appear first within a group; each set keeps array order.
 
-### 2. Run it locally
+### Add a project
+
+In [`src/content/projects.js`](src/content/projects.js):
+
+```js
+export const projects = [
+  {
+    title: "Research Assistant Toolkit",
+    status: "Active",
+    summary: "Scripts and evaluation data for comparing research assistants.",
+    tags: ["Evaluation", "Open Source"],
+    links: [
+      { label: "Code", href: "https://github.com/USERNAME/research-assistants" },
+      { label: "Demo", href: "https://example.com/research-assistants" }
+    ]
+  },
+  // Keep your other projects here.
+];
+```
+
+Projects appear in array order. Put an entry first to make it the first card.
+
+### Add a news item
+
+In [`src/content/news.js`](src/content/news.js):
+
+```js
+export const news = [
+  {
+    date: "2026.10",
+    icon: "release",
+    text: "The Research Assistant Toolkit is now available.",
+    href: "https://example.com/research-assistants"
+  },
+  // Keep your older news here.
+];
+```
+
+Keep news newest first: the page uses array order, and Profile Details shows the first four items. Other icon names include `accepted`, `dataset`, `talk`, `award`, and `career`.
+
+## Deploy with GitHub Pages
+
+Replace `USERNAME` with your account name. `academic-site` below is an example repository name.
+
+| Repository | Published URL | Asset base path |
+| --- | --- | --- |
+| `USERNAME.github.io` | `https://USERNAME.github.io/` | `/` |
+| `academic-site` | `https://USERNAME.github.io/academic-site/` | `/academic-site/` |
+
+Leave `siteMeta.url` empty, as it is in the template. The workflow sets `GITHUB_REPOSITORY`, and Vite derives the public site URL, asset base path, and sharing-image URL. Both setups use the same workflow with no URL changes. The base path tells the browser where to load scripts, styles, and icons; a wrong prefix can cause 404s.
+
+The PNG preview image is included. To replace it, change `siteMeta.image` to a path such as `"images/my-preview.png"`; Vite turns it into the correct absolute public URL.
+
+After enabling **GitHub Actions** in **Settings → Pages**, push or merge into `main`. Wait for **Actions → Deploy Pages** to succeed, then open the published URL in **Settings → Pages**.
+
+For a custom domain, set `siteMeta.url` once in `src/content/site.js`, for example `url: "https://researcher.example.org/"`. Its path controls the build base, and relative sharing-image paths follow it automatically. See the [deployment reference](src/content/README.md#deployment-reference) for domain setup, other branches, and manual deployment.
+
+## Optional local preview
+
+Install [Node.js 22 LTS](https://nodejs.org/) to match the deployment workflow. Replace `USERNAME` and `REPOSITORY` with your repository details:
 
 ```bash
+git clone https://github.com/USERNAME/REPOSITORY.git
+cd REPOSITORY
 npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/`.
+Open `http://127.0.0.1:5173/`; saving a content file updates the local page. See the [deployment reference](src/content/README.md#preview-a-production-build) to preview the production build under a repository subpath.
 
-### 3. Replace the sample content
+## More options
 
-Most users only need to edit `src/content/` and add images to `public/images/`.
+The [content reference](src/content/README.md) covers every field, publication cards and grouping, rich text, image formats, section settings, and GitHub star badges.
 
-| Start here | Controls |
-| --- | --- |
-| `src/content/profile.js` | Name, role, affiliation, avatar, contact links, research focus, and bio |
-| `src/content/publications.js` | Papers, groups, venues, links, tags, figures, and featured cards |
-| `src/content/site.js` | Site title, metadata, repository link, section order, labels, and visibility |
-| `src/content/news.js` | News timeline |
-| `src/content/projects.js` | Research projects and repository links |
-| `src/content/teaching.js`, `talks.js` | Teaching and talks |
-| `src/content/education.js`, `experience.js` | Education and positions |
-| `src/content/awards.js`, `services.js` | Honors and academic service |
-
-The [content reference](src/content/README.md) documents every field, including publication grouping, rich text fragments, card selection, image paths, and project layout.
-
-For a first publish, start with `profile.js`, `publications.js`, and `site.js`. The remaining sections can stay as examples or be disabled from the `sections` array until you need them.
-
-## Publications
-
-Each paper uses a `group` string. Preferred group order comes from `publicationGroups` in `src/content/site.js`; groups that are not listed there still appear afterward.
-
-Card layout is explicit:
-
-- `featured: true` renders a large publication card.
-- Missing or false `featured` renders a compact row.
-- A featured paper may omit `image`; Athena then shows a generated text placeholder.
-- Adding an image does not automatically make a paper featured.
-
-Featured papers appear before compact papers within a group. Array order is preserved inside both sets.
-
-## Sections and navigation
-
-The `sections` array in `src/content/site.js` controls page order and the top navigation:
-
-```js
-{ id: "talks", title: "Talks", nav: "Talks", enabled: false }
-```
-
-- Set `enabled: false` to hide a section.
-- Set `nav: false` to keep a section on the page but remove it from the top navigation.
-- Reorder entries to reorder the page.
-
-## Images
-
-Store site images in `public/images/` and use paths without a leading slash:
-
-```js
-image: "images/my-paper.png"
-```
-
-That path format works for both root sites and project-page deployments. Publication figures use a `16:9` frame with `object-fit: contain`.
-
-For `.png`, `.jpg`, and `.jpeg` publication figures, Athena requests a same-name WebP first and retains the original as a fallback:
-
-```text
-public/images/my-paper.png
-public/images/my-paper.webp
-```
-
-Images already stored as `.webp` or `.svg` are used directly. See the [image guide](src/content/README.md#publication-images-and-webp) for conversion commands and favicon setup.
-
-## Links and GitHub stats
-
-Athena recognizes common link labels such as `Paper`, `Code`, `Dataset`, `Demo`, `Slides`, `Video`, `DOI`, `BibTeX`, `Poster`, `Documentation`, `Project`, and `Download` and assigns matching icons.
-
-Repository links can include a static star fallback:
-
-```js
-{ label: "Code", href: "https://github.com/owner/repo", stars: 128 }
-```
-
-The fallback appears immediately. Athena refreshes it from the GitHub API when the persistent browser cache is missing or stale and keeps the last successful value if anonymous API requests are rate-limited. Stats appear on repository-style links by default; use `showGithubStats: true` to override that behavior.
-
-## Deploy with GitHub Pages
-
-1. Open the repository's **Settings → Pages** page.
-2. Set **Build and deployment → Source** to **GitHub Actions**.
-3. Update `siteMeta.url`, `siteMeta.image`, and `siteMeta.repositoryUrl` in `src/content/site.js`.
-4. Push to `main`.
-
-The included [`pages.yml`](.github/workflows/pages.yml) workflow installs dependencies, builds `dist/`, and deploys it. Vite automatically uses `/` for `USERNAME.github.io` repositories and `/REPOSITORY/` for project Pages sites.
-
-For a custom domain, set `siteMeta.url` to that domain before deploying.
-
-## Project map
-
-```text
-src/content/          Editable profile and academic content
-src/App.jsx           Page rendering and section composition
-src/icons.js          Link and section icon mappings
-src/styles.css        Design system and responsive layout
-src/assets/fonts/     Bundled icon fonts
-public/images/        Avatars, paper figures, favicons, and social preview assets
-.github/workflows/    GitHub Pages deployment
-```
-
-## Check before publishing
-
-```bash
-npm run build
-npm run preview
-```
-
-Check the profile details, publication links and figures, section navigation, both color themes, and the mobile layout. Also confirm that every PNG or JPEG publication figure has its same-name WebP file.
+Put custom images in `public/images/` and use paths such as `"images/my-paper.png"` in content files. Each publication figure needs just one file: PNG, JPEG, WebP, and SVG work directly. See the [image guide](src/content/README.md#publication-images) for sizing. Keep social preview images in PNG or JPEG format.
 
 ## License
 

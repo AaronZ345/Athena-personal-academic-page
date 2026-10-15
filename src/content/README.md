@@ -2,6 +2,8 @@
 
 The files in this folder are the editable data layer for Athena. Most personal sites only need changes under `src/content/` and image files under `public/images/`.
 
+For a first edit, follow the [publication, project, and news examples](../../README.md#add-content). The [GitHub Pages guide](../../README.md#deploy-with-github-pages) covers root sites, repository subpaths, and local previews.
+
 Start with these files:
 
 1. `profile.js`
@@ -23,11 +25,13 @@ Run `npm run build` after editing. JavaScript syntax errors, missing exports, an
 | `title` | Yes | Browser title and Open Graph/Twitter title. |
 | `description` | Yes | Standard HTML description. |
 | `socialDescription` | Yes | Open Graph and Twitter description. |
-| `url` | Yes | Public canonical site URL, preferably with a trailing slash. |
-| `image` | Yes | Absolute public URL for the social preview image. |
+| `url` | No | Leave empty for automatic GitHub Pages URLs. For a custom domain or another host, set the full site URL, including any subpath. |
+| `image` | Yes | PNG or JPEG social preview: a relative path such as `images/athena-og.png`, or a full external URL. |
 | `repositoryUrl` | No | Repository linked by “Built with Athena” in the footer. Use an empty string to hide the link. |
 
-Use absolute URLs for `url` and `image`; social crawlers do not reliably resolve local development paths.
+The template includes `public/images/athena-og.png` for social previews. Vite resolves a relative `image` against the public site URL and writes absolute URLs into the sharing metadata. Keep content image paths relative so project deployments retain their repository prefix.
+
+With `url: ""`, GitHub Actions derives the public URL from `GITHUB_REPOSITORY`. Locally, it falls back to `http://127.0.0.1:5173/`. Set `url` for hosting outside GitHub Pages or a custom domain; its path also supplies the production asset base. A missing trailing slash is added automatically. The local development server still runs at `/`.
 
 ### `sections`
 
@@ -186,7 +190,7 @@ The metrics section reads this array directly:
 
 Venue family inference checks `type` and `venue` for journal, dataset/benchmark, report/preprint/technical, or workshop terms; everything else is treated as a conference.
 
-## Publication images and WebP
+## Publication images
 
 Keep image files under `public/images/` and use paths without a leading slash:
 
@@ -196,43 +200,7 @@ image: "images/reliable-agents.png"
 
 The publication frame is `16:9` with `object-fit: contain`. Other aspect ratios work, but they leave more empty space.
 
-### Raster images require a same-name WebP
-
-For `.png`, `.jpg`, and `.jpeg` publication paths, Athena creates a `<picture>` source by replacing the extension with `.webp`. This means the example above requests:
-
-```text
-public/images/reliable-agents.webp  # preferred source
-public/images/reliable-agents.png   # original fallback
-```
-
-Keep both files. A browser that supports WebP may select the WebP URL first and show a broken image if that file is missing, even when the PNG exists.
-
-Generate WebP with `cwebp`:
-
-```bash
-# macOS, one-time install
-brew install webp
-
-cwebp -q 90 public/images/reliable-agents.png \
-  -o public/images/reliable-agents.webp
-```
-
-ImageMagick is another option:
-
-```bash
-magick public/images/reliable-agents.png \
-  -quality 90 public/images/reliable-agents.webp
-```
-
-If `image` points directly to `.webp` or `.svg`, no alternate source is generated. A direct WebP path needs only that WebP file; an SVG needs only the SVG.
-
-Check the pair before pushing:
-
-```bash
-file public/images/reliable-agents.png public/images/reliable-agents.webp
-npm run build
-test -f dist/images/reliable-agents.webp
-```
+Upload one file and use its path. PNG, JPEG, WebP, and SVG figures are loaded as written. An absolute image URL also works. You can choose WebP to reduce download size; no companion file is required.
 
 ## Link objects and GitHub stars
 
@@ -327,6 +295,37 @@ Trailing years are split from the service name and displayed as `2025 / 2026`. B
 
 `index.js` re-exports the content modules for `App.jsx`. You normally do not edit it. Update it only when adding a new content file and a matching renderer.
 
+## Deployment reference
+
+Standard GitHub Pages setup and URL examples are in the [main README](../../README.md#deploy-with-github-pages). With `siteMeta.url` empty, the included workflow reads `GITHUB_REPOSITORY` to choose `/` for an account site or `/REPOSITORY/` for a project site, and fills in the public metadata URLs.
+
+### Preview a production build
+
+For the unchanged template with `GITHUB_REPOSITORY` unset, run `npm run build` followed by `npm run preview` and open `http://127.0.0.1:4173/`. If you set a custom URL with a subpath, the production preview uses that path too.
+
+To check a project site, pass its base path to both commands:
+
+```bash
+npm run build -- --base=/academic-site/
+npm run preview -- --base=/academic-site/
+```
+
+Open `http://127.0.0.1:4173/academic-site/`. Replace `academic-site` with your repository name, including capitalization, and keep both slashes. Check that styles, images, and navigation work at that URL.
+
+### Other branches and manual deployment
+
+If your default branch is not `main`, update `on.push.branches` in `.github/workflows/pages.yml`. To deploy manually, open **Actions → Deploy Pages → Run workflow** and select your default branch to build its latest commit. Selecting an older branch publishes that branch's content to the same live site.
+
+### Custom domains
+
+Configure the domain in **Settings → Pages** using [GitHub's DNS instructions](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site). Set `url` inside `siteMeta` in `src/content/site.js`:
+
+```js
+url: "https://researcher.example.org/"
+```
+
+Vite uses that URL for metadata and its path for built assets, overriding repository-name inference. Relative sharing-image paths resolve against it. You do not need to edit the workflow or Vite configuration. For a site under a subpath, use a URL such as `https://researcher.example.org/lab/`.
+
 ## Before pushing
 
 ```bash
@@ -334,4 +333,4 @@ npm run build
 npm run preview
 ```
 
-Then check the profile, section order, publication grouping, featured/compact split, publication images, links, GitHub star badges, light and dark themes, and the mobile layout. For every PNG/JPEG publication figure, verify that the same-name WebP exists in both `public/images/` and the generated `dist/images/` directory.
+Then check the content you changed, including its links and images, in the local preview.

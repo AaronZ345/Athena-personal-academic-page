@@ -418,10 +418,7 @@ function PublicationVisual({ paper }) {
 
   return (
     <div className="paper-figure">
-      <picture>
-        {isRasterImage(paper.image) ? <source srcSet={toWebpPath(paper.image)} type="image/webp" /> : null}
-        <img src={paper.image} alt={`${paper.title} visual summary`} loading="lazy" decoding="async" />
-      </picture>
+      <img src={paper.image} alt={`${paper.title} visual summary`} loading="lazy" decoding="async" />
     </div>
   );
 }
@@ -963,14 +960,6 @@ function getInitials(value = "") {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("") || "A";
-}
-
-function isRasterImage(src) {
-  return /\.(png|jpe?g)$/i.test(src);
-}
-
-function toWebpPath(src) {
-  return src.replace(/\.(png|jpe?g)$/i, ".webp");
 }
 
 function escapeRegExp(value) {
