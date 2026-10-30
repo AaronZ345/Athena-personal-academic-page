@@ -607,11 +607,16 @@ function ServiceList({ items }) {
           </h3>
           <div className="service-chip-grid">
             {group.items.map((item) => {
-              const { title, year } = splitServiceYears(item);
+              const { label, href } = typeof item === "string" ? { label: item } : item;
+              const { title, year } = splitServiceYears(label);
 
               return (
-                <span className="service-chip" key={item}>
-                  <span>{title}</span>
+                <span className="service-chip" key={label}>
+                  {href ? (
+                    <a href={href} target="_blank" rel="noreferrer">{title}</a>
+                  ) : (
+                    <span>{title}</span>
+                  )}
                   {year ? <time>{year}</time> : null}
                 </span>
               );

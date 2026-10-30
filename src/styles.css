@@ -1616,8 +1616,21 @@ a.timeline-place:hover {
   line-height: 1.45;
 }
 
-.service-chip span {
+.service-chip span,
+.service-chip a {
   font-weight: 480;
+}
+
+.service-chip a:hover,
+.service-chip a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.service-chip a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .honor-row time {

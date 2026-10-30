@@ -280,7 +280,10 @@ Each service group has a category and an array of items:
 ```js
 {
   category: "Conference Reviewer",
-  items: ["NeurIPS 2025, 2026", "ICML 2026"]
+  items: [
+    { label: "NeurIPS 2025, 2026", href: "https://neurips.cc/" },
+    "Open Science Workshop 2026"
+  ]
 }
 ```
 
@@ -288,6 +291,8 @@ Each service group has a category and an array of items:
 | --- | --- | --- |
 | `category` | Yes | Group heading and service icon selection. |
 | `items` | Yes | Service chips shown under the heading. |
+
+Each item can be a plain string or an object with `label` and optional `href`. A linked name opens in a new tab; entries without `href` remain plain text. Prefer a permanent conference website or an official society's conference page over a URL for one year.
 
 Trailing years are split from the service name and displayed as `2025 / 2026`. Built-in category icons include `Conference Reviewer`, `Journal Reviewer`, `Program Committee`, `Area Chair`, `Organizer`, and `Mentor`; other categories use the default icon.
 
